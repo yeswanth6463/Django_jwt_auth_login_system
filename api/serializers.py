@@ -3,7 +3,7 @@ from .models import SailorUser
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
-
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 class SailorUserSerializer(serializers.ModelSerializer):
     email = serializers.SlugRelatedField(
@@ -13,3 +13,39 @@ class SailorUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = SailorUser
         fields = ['id', 'email', 'name', 'age', 'rank', 'mobile_number', 'address']
+        
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+
+        try:
+            sailor = SailorUser.objects.get(email=user)
+
+            
+            token['email'] = user.email
+            token['is_verified'] = sailor.is_verified
+
+        except SailorUser.DoesNotExist:
+            pass
+
+        return token
+
+    def validate(self, attrs):
+        data = super().validate(attrs)
+
+
+        sailor = SailorUser.objects.get(email=self.user)
+        data.pop('refresh', None)
+        # if not sailor.is_verified:
+        #     raise serializers.ValidationError("Email not verified")
+        #     data['user'] = {
+        #     "id": self.user.id,
+        #     "email": self.user.email,
+        #     "name": sailor.name,
+        #     "is_verified": sailor.is_verified
+        # }
+        return data
+
+

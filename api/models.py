@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
+from django.utils import timezone
 
 class SailorUser(models.Model):
     email = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -10,7 +11,7 @@ class SailorUser(models.Model):
     address = models.TextField(blank=True, null=True)
     is_verified = models.BooleanField(default=False)
     otp = models.CharField(blank=True,null=True)
-    otp_created_at = models.DateField(blank=True,null=True)
+    otp_created_at = models.DateTimeField(default=timezone.now)
     is_google_auth =  models.BooleanField(default=False)
     
 

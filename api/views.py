@@ -1,11 +1,9 @@
 from  rest_framework import generics,status
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.authentication import TokenAuthentication
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.decorators import api_view, permission_classes, authentication_classes
+from rest_framework.decorators import api_view, permission_classes
 from .models import SailorUser
-from .serializers import SailorUserSerializer
+from .serializers import SailorUserSerializer,MyTokenObtainPairSerializer
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
 from django.http import HttpResponse, JsonResponse, Http404
@@ -29,6 +27,7 @@ from django.contrib.auth import authenticate
 from .otpgenerstor import generate_otp
 from django.utils import timezone
 from datetime import timedelta
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 class GoogleLoginView(APIView):
     permission_classes = [AllowAny]
@@ -90,7 +89,6 @@ def signup_user(request):
         user.save()
         sailor_user = SailorUser.objects.create(email=user)
         sailor_user.otp = generate_otp()
-        
         sailor_user.otp_created_at = timezone.now()
         sailor_user.save()
         send_mail(
@@ -100,8 +98,6 @@ def signup_user(request):
             recipient_list=[sailor_user.email.email],
             fail_silently=False
         )
-        
-
         return Response(
             {'message': 'User created successfully. Please verify your email.'},
             status=status.HTTP_201_CREATED
@@ -114,6 +110,49 @@ def signup_user(request):
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
 
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
+
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def resend_otp(request):
+    email = request.data.get("email")
+
+    try:
+        user = User.objects.get(email=email)
+        sailor_user = SailorUser.objects.get(email=user)
+    except User.DoesNotExist:
+        return Response({"msg": "User not found"}, status=404)
+    except SailorUser.DoesNotExist:
+        return Response({"msg":"Sailor use not found"},status=404)
+
+    if sailor_user.is_verified:
+        return Response({"msg": "User already verified"}, status=400)
+
+
+    if sailor_user.otp_created_at and timezone.now() < sailor_user.otp_created_at + timedelta(minutes=1):
+        return Response({"msg": "Please wait before requesting new OTP"}, status=400)
+    
+    sailor_user.otp = generate_otp()
+    sailor_user.otp_created_at = timezone.now()
+    sailor_user.save()
+
+    send_mail(
+        subject="Resend OTP",
+        message=f"Your new OTP is {sailor_user.otp}",
+        from_email=settings.EMAIL_HOST_USER,
+        recipient_list=[email],
+        fail_silently=False
+    )
+
+    return Response({"msg": "New OTP sent successfully"}, status=200)
+
+
+
+
+
 #Normal Login View
 @csrf_exempt
 @api_view(['POST'])
@@ -124,16 +163,21 @@ def login_user(request):
     user = authenticate(request, username=email, password=password)
     if user is not None:
         refresh = RefreshToken.for_user(user)
-        sailor_obj = SailorUser.objects.get(email=user)
-    
-        return Response({
-            'access': str(refresh.access_token),
-            'refresh': str(refresh),
-            'user': {
-                'email': user.email,
-                'name': sailor_obj.name,
-            }
-        })
+        try:
+            sailor_obj = SailorUser.objects.get(email=user)
+            if sailor_obj.is_verified:
+                return Response({
+                'access': str(refresh.access_token),
+                'refresh': str(refresh),
+                'user': {
+                    'email': user.email,
+                    'name': sailor_obj.name,
+                }
+                        })
+            else:
+                return Response({"error":"user is not verified correctly pls again signUp"},status=404)
+        except SailorUser.DoesNotExist:
+            return Response({"error":"user is removed"},status=404)
     else:
         return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
     
@@ -148,78 +192,15 @@ def verify_email(request):
         user = User.objects.get(email=email)
         sailor_user = SailorUser.objects.get(email=user)
     except User.DoesNotExist  :
-        return 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        
-        
+        return Response({"msg":"user not found"},status=404)
     except SailorUser.DoesNotExist:
         return Response({"msg":"User Not Found "},status=404)
-    
     if sailor_user.otp != otp:
         return Response({"msg":"Invalid OTP"},status=400)
-    
     if timezone.now() > sailor_user.otp_created_at + timedelta(minutes=5):
         return Response({"msg":"OTP expired"},status=400)
-
     sailor_user.is_verified = True
     sailor_user.otp = None
     sailor_user.save()
-    
-    return Response({"message":"Email verfied Successfully"})
-  
+    return Response({"message":"Email verfied Successfully"},status=200)
+

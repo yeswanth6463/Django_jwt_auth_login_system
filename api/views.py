@@ -4,8 +4,6 @@ from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from .models import SailorUser
 from .serializers import SailorUserSerializer,MyTokenObtainPairSerializer
-from django.shortcuts import get_object_or_404
-from django.http import JsonResponse
 from django.http import HttpResponse, JsonResponse, Http404
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User

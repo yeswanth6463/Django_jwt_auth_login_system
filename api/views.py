@@ -3,7 +3,16 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from .models import SailorUser
-from .serializers import SailorUserSerializer,MyTokenObtainPairSerializer
+from .serializers import (SailorUserSerializer,
+MyTokenObtainPairSerializer,
+CourseSerializer,
+CategorySerializer,
+ModuleSerializer,
+video_contentsSerializer,
+docs_contentsSerializer,
+
+
+                )
 from django.http import HttpResponse, JsonResponse, Http404
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User

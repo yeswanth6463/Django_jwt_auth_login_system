@@ -216,8 +216,9 @@ def verify_email(request):
     sailor_user.save()
     return Response({"message":"Email verfied Successfully"},status=200)
 
-##############################################################################
+##############################################################################################################################################################
 ##################### CATEGORY API VIEWS ##################################### ###############################################################################
+##############################################################################################################################################################
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def create_category(request):
@@ -266,8 +267,9 @@ class CategoryListView(generics.ListAPIView):
     serializer_class = CategorySerializer
     permission_classes = [AllowAny]
 
-##############################################################################
+################################################################################################################################################################
 ########### Course API Views ################################################## ###############################################################################
+###############################################################################################################################################################
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def Create_course(request):
@@ -337,9 +339,9 @@ def create_module(request):
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def get_module_details(request, moudule_id):
+def get_module_details(request, module_id):
     try:
-        module_obj =  Module.objects.get(id=moudule_id)
+        module_obj =  Module.objects.get(id=module_id)
     except Module.DoesNotExist:
         return Response({"msg":"Module Not Found"},status=404)
     serializer = ModuleSerializer(module_obj)
@@ -391,7 +393,7 @@ def get_video_content_details(request , video_id):
         video_obj = video_contents.objects.get(id=video_id)
     except video_contents.DoesNotExist:
         return Response({"msg":"Video Content Not Found"},status=404)
-    serializer = video_contentsSerializer(video_obj)
+    serializer = video_contentsSerializer(video_obj, context={'request': request})
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 @api_view(['PUT'])
@@ -424,8 +426,9 @@ class video_content_list(generics.ListCreateAPIView):
     permission_classes = [AllowAny]
     
     
-##############################################################################################
+##########################################################################################################################################
 ########## DOCS CONTENT API VIEWS  #######################################################################################################
+##########################################################################################################################################
     
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -438,12 +441,12 @@ def Create_docs_content(request):
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def get_details_docs_content(request_id):
+def get_details_docs_content(request,docs_id):
     try:
-        docs_obj = docs_contents.objects.get(id=request_id)
+        docs_obj = docs_contents.objects.get(id=docs_id)
     except docs_contents.DoesNotExist:
         return Response({"msg":"Docs Content Not Found"},status=404)
-    serializer = docs_contentsSerializer(docs_obj)
+    serializer = docs_contentsSerializer(docs_obj, context={'request': request})
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -477,8 +480,8 @@ class docs_content_list(generics.ListCreateAPIView):
     permission_classes = [AllowAny]
     
 
-###################################################################################################
-################################ OVER ALL COURSE  DETAILVIEW vIEWS  #######################################################################################################
+################################################################################################################
+################################ OVER ALL COURSE  DETAILVIEW vIEWS ################################################ ########################################################################################################################
 
 
 @api_view(['GET'])

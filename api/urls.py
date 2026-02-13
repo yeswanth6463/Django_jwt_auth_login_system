@@ -69,9 +69,9 @@ path('courses/',views.courlistseview.as_view(),name='course list create'),
     ############################
     path('video_contents/',views.video_content_list.as_view(),name='video contents list create'),
     path('create_video_content/',views.Create_video_content,name='create video content'),
-    path('video_content/<int:video_content_id>/',views.get_video_content_details,name='video content detail'),
-    path('update_video_content/<int:video_content_id>/',views.update_video_content,name='update video content'),
-    path('delete_video_content/<int:video_content_id>/',views.delete_video_content,name='delete video content'),
+    path('video_content/<int:video_id>/',views.get_video_content_details,name='video content detail'),
+    path('update_video_content/<int:video_id>/',views.update_video_content,name='update video content'),
+    path('delete_video_content/<int:video_id>/',views.delete_video_content,name='delete video content'),
    
 
 
@@ -80,10 +80,10 @@ path('courses/',views.courlistseview.as_view(),name='course list create'),
     ############################
     path('docs_contents/',views.docs_content_list.as_view(),name='docs contents list create'),
     path('create_docs_content/',views.Create_docs_content,name='create docs content'),
-    path('docs_content/<int:docs_content_id>/',views.get_details_docs_content,name='docs content detail'),
-    path('update_docs_content/<int:docs_content_id>/',views.update_docs_content,name
+    path('docs_content/<int:docs_id>/',views.get_details_docs_content,name='docs content detail'),
+    path('update_docs_content/<int:docs_id>/',views.update_docs_content,name
 ='update docs content'),
-    path('delete_docs_content/<int:docs_content_id>/',views.delete_docs_content,name='delete docs content'),    
+    path('delete_docs_content/<int:docs_id>/',views.delete_docs_content,name='delete docs content'),    
     
     
 ############################################

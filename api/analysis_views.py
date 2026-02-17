@@ -10,7 +10,11 @@ from .models import (
     video_contents,
     docs_contents,
     Video_Activity,
-    BaseModel
+    Soar_Category,
+    Soar_Quiz_Data,
+    Soar_Quiz_Answer,
+    Soar_Quiz_Average_Score
+    
     
     
     )
@@ -21,7 +25,12 @@ CategorySerializer,
 ModuleSerializer,
 video_contentsSerializer,
 docs_contentsSerializer,
-video_activitySerializer
+video_activitySerializer,
+Soar_CategorySerializer,
+Soar_Quiz_DataSerializer,
+Soar_Quiz_AnswerSerializer,
+Soar_Quiz_Average_ScoreSerializer
+
 
 
                 )
@@ -43,6 +52,67 @@ from .otpgenerstor import generate_otp
 from django.utils import timezone
 from datetime import timedelta
 from rest_framework.permissions import IsAuthenticated
+from rest_framework import viewsets 
+
+##########################################################
+########## SOAR CARD CATEGORY API VIEWS ################### ###########################################################
+
+
+class Soar_CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Soar_Category.objects.all()
+    serializer_class = Soar_CategorySerializer
+    permission_classes = [AllowAny]
+    
+##########################################################
+########## SOAR QUIZ DATA API VIEWS ################### ###########################################################
+
+class Soar_Quiz_DataViewSet(viewsets.ModelViewSet):
+    queryset = Soar_Quiz_Data.objects.all()
+    serializer_class = Soar_Quiz_DataSerializer
+    permission_classes = [AllowAny]
+    
+##########################################################
+########## SOAR QUIZ ANSWER API VIEWS ################### ###########################################################
+
+class Soar_Quiz_AnswerViewSet(viewsets.ModelViewSet):
+    queryset = Soar_Quiz_Answer.objects.all()
+    serializer_class = Soar_Quiz_AnswerSerializer
+    permission_classes = [AllowAny]
+    
+
+##########################################################
+########## SOAR QUIZ AVERAGE SCORE API VIEWS ################### ###########################################################
+class Soar_Quiz_Average_ScoreViewSet(viewsets.ModelViewSet):
+    queryset = Soar_Quiz_Average_Score.objects.all()
+    serializer_class = Soar_Quiz_Average_ScoreSerializer
+    permission_classes = [AllowAny]
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

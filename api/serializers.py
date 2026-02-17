@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import SailorUser,Course,Category,Module,video_contents,docs_contents,Video_Activity
+from .models import SailorUser,Course,Category,Module,video_contents,docs_contents,Video_Activity,Soar_Quiz_Average_Score,Soar_Category,Soar_Quiz_Data,Soar_Quiz_Answer  
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -99,3 +99,42 @@ class video_activitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Video_Activity
         fields = ['id','video', 'activity_time', 'type']
+        
+class Soar_CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Soar_Category
+        fields = '__all__'
+        
+class Soar_Quiz_DataSerializer(serializers.ModelSerializer):
+    category = serializers.SlugRelatedField(
+        slug_field='name',
+        queryset=Soar_Category.objects.all()
+    )
+    class Meta:
+        model = Soar_Quiz_Data
+        fields = ['id','category', 'question', 'option_a', 'option_b', 'option_c', 'option_d', 'correct_option']
+        
+class Soar_Quiz_AnswerSerializer(serializers.ModelSerializer):
+     quiz_data = serializers.SlugRelatedField(
+            slug_field='question',
+            queryset=Soar_Quiz_Data.objects.all()
+        )
+     SailorUser = serializers.SlugRelatedField(
+            slug_field='email',queryset = SailorUser.objects.all())
+     class Meta:
+            model = Soar_Quiz_Answer
+            fields = ['id','quiz_data', 'selected_option','SailorUser', 'score']
+        
+class Soar_Quiz_Average_ScoreSerializer(serializers.ModelSerializer):
+    category = serializers.SlugRelatedField(
+        slug_field='name',
+        queryset=Soar_Category.objects.all()
+    )
+    SailorUser = serializers.SlugRelatedField(
+        slug_field='email',
+        queryset=SailorUser.objects.all()
+    )
+    class Meta:
+        model = Soar_Quiz_Average_Score
+        fields = ['id','SailorUser','category', 'average_score']
+         

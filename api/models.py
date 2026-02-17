@@ -116,7 +116,7 @@ class Soar_Quiz_Data(BaseModel):
         return super().__str__()
     
 class  Soar_Quiz_Answer(BaseModel):
-    
+    SailorUser = models.ForeignKey(SailorUser, on_delete=models.CASCADE, related_name='quiz_answers')
     quiz_data = models.ForeignKey(Soar_Quiz_Data, on_delete=models.CASCADE, related_name='answers')
     selected_option = models.CharField(max_length=255)
 
@@ -124,8 +124,10 @@ class  Soar_Quiz_Answer(BaseModel):
         return super().__str__()
 
 class Soar_Quiz_Average_Score(BaseModel):
+    SailorUser = models.ForeignKey(SailorUser, on_delete=models.CASCADE, related_name='average_scores')
     category = models.ForeignKey(Soar_Category, on_delete=models.CASCADE, related_name='average_scores')
     average_score = models.FloatField()
+    
 
     def __str__(self):
         return super().__str__()
